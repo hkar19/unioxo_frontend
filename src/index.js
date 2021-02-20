@@ -3,11 +3,14 @@ import ReactDOM from 'react-dom';
 import './normalise.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import App from './App';
+import { CookiesProvider } from 'react-cookie';
 import reportWebVitals from './reportWebVitals';
 
 ReactDOM.render(
   <React.StrictMode>
-    <App />
+    <CookiesProvider>
+      <App />
+    </CookiesProvider>
   </React.StrictMode>,
   document.getElementById('root')
 );

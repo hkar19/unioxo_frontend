@@ -10,13 +10,26 @@ const reducer = (state = initialState, action)=>{
   switch (action.type) {
     case LOAD_REGISTERED_USERS:{
       let users = action.payload;
+      // console.log({users});
       return {...state, registeredUsers: users}
     }
 
     case REGISTER_USER: {
       let user = action.payload;
-      console.log({payload: action.payload});
+      // do not store fotoURL
+      console.log({a: state.registeredUsers})
+      let storeToCookeFunction = action.function;
+      // console.log({storeToCookeFunction});
+      // console.log({payload: action.payload});
       let newRegisteredUsers = [...state.registeredUsers, user];
+      // let {fotoURL, ...rest} = user;
+      // let userstoCookie = [...state.registeredUsers, rest]
+      // let newRegisteredUsers = [];
+      // let userstoCookie = []
+      // newRegisteredUsers.push(state.registeredUsers,user);
+      // userstoCookie.push(state.registeredUsers, rest);
+      // console.log(newRegisteredUsers);
+      // storeToCookeFunction(userstoCookie);
       return {...state, registeredUsers: newRegisteredUsers}
     };
 

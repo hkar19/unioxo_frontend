@@ -16,16 +16,16 @@ const LoginPage = ({registeredUsers , letUserLogin}) => {
   const userNameRef = useRef();
 
   useEffect(() => {
-    console.log({registeredUsers});
+    // console.log({registeredUsers});
     userNameRef.current.focus()
 
   }, [])
 
   const onSubmitLogin = (e)=>{
     e.preventDefault();
-
-    let foundUser = registeredUsers.find(val=>{
-      console.log({val});
+    console.log(registeredUsers);
+    let foundUser = registeredUsers && registeredUsers.find(val=>{
+      // console.log({val});
       return val.user_name === userName
     })
 
@@ -35,7 +35,7 @@ const LoginPage = ({registeredUsers , letUserLogin}) => {
         letUserLogin(foundUser)
       }
       else{
-        console.log("here?");
+        // console.log("here?");
         toggleModal(true, 'Gagal', 'Password salah atau user tidak ditemukan');
       }
     } else {

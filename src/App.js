@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { connect, Provider } from 'react-redux'
 import { BrowserRouter, Redirect, Route, Switch } from 'react-router-dom'
 import HomePage from './routes/HomePage'
@@ -10,25 +10,48 @@ import ProfilePage from './routes/ProfilePage'
 
 import './App.css'
 import { useCookies } from 'react-cookie'
+import { loadUsers } from './reduxStore/reduxActions'
 
-const App = (props) => {
+const App = ({currentUser, loadUsers}) => {
+
+  const [cookies, setCookies, removeCookies] = useCookies(['stored_users']);
+  
+  // useEffect(() => {
+  //   let cookie = cookies
+  //   console.log({cookie});
+  //   console.log({registeredUsers: props.registeredUsers});
+  // })
+
+  useEffect(()=>{
+    let cookie = cookies['stored_users'];
+    if(cookie) loadUsers(cookie);
+  },[loadUsers, cookies])
+
+  useEffect(()=>{
+    const deleteCookie = ()=>{
+      removeCookies('stored_users',{path: '/', maxAge: 12*60*60});
+    }
+    deleteCookie()
+    console.log('done')
+  },[])
+
   return (
     <BrowserRouter>
       <Switch>
         <Route path='/login'>
-          {props.currentUser ? <Redirect to='/home'/> : <LoginPage/>}
+          {currentUser ? <Redirect to='/home'/> : <LoginPage/>}
         </Route>
         <Route path='/registration'>
           <RegistrationPage/>
         </Route>
         <Route path='/home/profile'>
-          {props.currentUser ? <ProfilePage/>: <Redirect to='login'/>}
+          {currentUser ? <ProfilePage/>: <Redirect to='login'/>}
         </Route>
         <Route path='/home'>
-          {props.currentUser ? <HomePage/>: <Redirect to='/login'/>}
+          {currentUser ? <HomePage/>: <Redirect to='/login'/>}
         </Route>
         <Route path='/' >
-          {props.currentUser ? <Redirect to='/home'/> : <Redirect to='login'/>}
+          {currentUser ? <Redirect to='/home'/> : <Redirect to='login'/>}
         </Route>
       </Switch>
     </BrowserRouter>
@@ -36,10 +59,8 @@ const App = (props) => {
 }
 
 const AppWrapped = ()=>{
-
-  const AppConnected = connect((states)=>({...states}))(App);
-  // useCookies
-  
+//  loadUsers
+  const AppConnected = connect((states)=>({...states}),{loadUsers})(App);
 
   return (
     <Provider store={store}>

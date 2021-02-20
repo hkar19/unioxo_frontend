@@ -7,8 +7,8 @@ export const loadUsers = (users)=>{
   return {type: LOAD_REGISTERED_USERS, payload: users}
 }
 
-export const addUser = (user, addToCookieFunction)=>{
-  return {type: REGISTER_USER, payload: user, function: addToCookieFunction}
+export const addUser = (user, storeToCookieFunction)=>{
+  return {type: REGISTER_USER, payload: user, function: storeToCookieFunction}
 }
 
 export const letUserLogin = (user)=>{

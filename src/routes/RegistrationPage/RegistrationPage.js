@@ -1,17 +1,19 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { Button, Form, FormFeedback, FormGroup, Input, Label, Modal, ModalBody, ModalFooter, ModalHeader} from 'reactstrap';
 import ImageUploading from "react-images-uploading";
-import { MediaBlock, RectShape } from 'react-placeholder/lib/placeholders';
+// import { MediaBlock, RectShape } from 'react-placeholder/lib/placeholders';
 import "react-placeholder/lib/reactPlaceholder.css";
-import ReactPlaceholder from 'react-placeholder';
+// import ReactPlaceholder from 'react-placeholder';
 import { connect } from 'react-redux';
 import { addUser } from '../../reduxStore/reduxActions';
 import LinkButton from '../../components/LinkButton';
+import { useCookies } from 'react-cookie';
+import { withRouter } from 'react-router-dom';
 
-const RegistrationPage = ({addUser,registeredUsers = []}) => {
+const RegistrationPage = ({addUser,registeredUsers = [], history}) => {
   const [namaMhs, setNamaMhs] = useState('');
   const [nim, setNim] = useState('');
-  const [userName, setUserName] = useState('');
+  const [user_name, setUserName] = useState('');
   const [password, setPassword] = useState('');
   const [passwordRepeat, setPasswordRepeat] = useState('');
   const [showModal, setShowModal] = useState({
@@ -27,17 +29,41 @@ const RegistrationPage = ({addUser,registeredUsers = []}) => {
 
   const namaMhsRef = useRef();
 
+  // eslint-disable-next-line 
+  let [cookies, setCookies ] = useCookies(['stored_users'])
+
   useEffect(() => {
-    console.log({registeredUsers});
+    // console.log({registeredUsers});
     if(namaMhsRef.current) namaMhsRef.current.focus()
   }, [])
 
+  // useEffect(()=>{
+  //   console.log({regisCookie: cookies});
+  // })
+
+  const storeToCookie =(allUsers)=>{
+    // console.log({cookiesHere: cookies});
+    setCookies('stored_users',allUsers,{path: '/', maxAge: 12*60*60})
+    // console.log({cookiesAfter: cookies});
+    // console.log('stored');
+  }
+
+  // const deleteCookie = ()=>{
+  //   removeCookies('stored_users',{path: '/', maxAge: 12*60*60});
+  // }
+
   const onSubmitForm = (e)=>{
     e.preventDefault();
+    // deleteCookie();
+    // return;
+    // let cookieFunction = {...storeToCookie};
+
+    // storeToCookie([mahasiswa])
+    // return;
     // toggleModal(true)
-    console.log("Clicked");
+    // console.log("Clicked");
     if(!fotoMhs) {
-      console.log("here?");
+      // console.log("here?");
       toggleModal(true,'Gagal', 'Silakan masukkan foto')
       return;
     }
@@ -54,7 +80,8 @@ const RegistrationPage = ({addUser,registeredUsers = []}) => {
     }
 
     let findUser = registeredUsers.find((val)=>{
-      return val.userName === userName;
+      // val
+      return val.user_name === user_name;
     })
 
     if(!!findUser){
@@ -62,15 +89,21 @@ const RegistrationPage = ({addUser,registeredUsers = []}) => {
       return;
     }
 
+    // console.log({fotoMhs: fotoMhs[0]});
+
     let mahasiswa = {
       nama: namaMhs,
       nim: nim,
-      user_name: userName,
+      user_name: user_name,
       password: password,
       fotoURL: fotoMhs[0].dataURL
     }
-    addUser(mahasiswa)
+    // console.log(mahasiswa);
+    addUser(mahasiswa, storeToCookie);
+    // storeToCookie([mahasiswa])
+    // storeToCookie([...registeredUsers, mahasiswa])
     toggleSuccessModal(true, 'Berhasil', 'Anda akan dikembalikan ke halaman login')
+    // return;
   }
 
   const handleNameInput=(e)=>{
@@ -102,9 +135,9 @@ const RegistrationPage = ({addUser,registeredUsers = []}) => {
     setPassRepeatValidity(val === password);
   }
 
-  const handlePictureUpload = (picture)=>{
-    console.log({picture});
-  }
+  // const handlePictureUpload = (picture)=>{
+  //   console.log({picture});
+  // }
 
   const toggleModal = (isShown = false, header= '', message = '')=>{
     setShowModal({isShown, header, message});
@@ -147,6 +180,7 @@ const RegistrationPage = ({addUser,registeredUsers = []}) => {
               <Input
                 id='nim_mhs'
                 bsSize='sm'
+                type='number'
                 required
                 value={nim}
                 onChange={handleNIMInput}
@@ -160,7 +194,7 @@ const RegistrationPage = ({addUser,registeredUsers = []}) => {
                 id='user_name'
                 bsSize='sm'
                 required
-                value={userName}
+                value={user_name}
                 onChange={handleUserNameInput}
                 placeholder="User name"
               />
@@ -201,8 +235,11 @@ const RegistrationPage = ({addUser,registeredUsers = []}) => {
                 Password tidak sama
               </FormFeedback>
             </FormGroup>
-            <Button type='submit'>Submit</Button>
+            <Button type='submit' block>Submit</Button>
+            <hr/>
+            
           </Form>
+          <Button onClick={()=>history.goBack()} color='danger' block>Kembali</Button>
         </div>
         <div style={{display:'flex', flexDirection:'column',flex:1, 
         // backgroundColor:'red', 
@@ -211,11 +248,11 @@ const RegistrationPage = ({addUser,registeredUsers = []}) => {
           <ImageUploading
             maxFileSize={0.5*1024*1024}
             onChange={(imageList)=>{
-              console.log({imageList});
+              // console.log({imageList});
               if(!!imageList[0]) setFotoMhs(imageList)
             }}
             onError={(errors, files)=>{
-              console.log({errors, files});
+              console.error({errors, files});
             }}
             acceptType={["jpg", "jpeg", "png"]}
           >
@@ -225,6 +262,7 @@ const RegistrationPage = ({addUser,registeredUsers = []}) => {
                 <>
                 {fotoMhs && !!fotoMhs[0] ? <img 
                   {...dragProps}
+                  alt="Foto mahasiswa"
                   src={fotoMhs[0].dataURL}
                   style={{
                     height: '40vh', width:'40vh', objectFit:'cover'
@@ -245,7 +283,7 @@ const RegistrationPage = ({addUser,registeredUsers = []}) => {
                   </div>
                 }
                 {
-                  fotoMhs && !!fotoMhs[0] ? <Button onClick={()=>setFotoMhs(null)}> Hapus </Button> : []
+                  fotoMhs && !!fotoMhs[0] ? <Button color='warning' onClick={()=>setFotoMhs(null)}> Hapus </Button> : []
                 }
 
                 {/* {!imageList[0] && } */}
@@ -287,11 +325,11 @@ const RegistrationPage = ({addUser,registeredUsers = []}) => {
         </ModalBody>
         <ModalFooter>
           {/* <Button onClick={()=>toggleSuccessModal(false)}>Kembali</Button> */}
-          <LinkButton to="/login">Kembali</LinkButton>
+          <LinkButton onClick={()=>toggleSuccessModal(false)} to="/login">Kembali</LinkButton>
         </ModalFooter>
       </Modal>
     </div>
   )
 }
 
-export default connect(({registeredUsers})=>({registeredUsers}),{ addUser })(RegistrationPage)
+export default connect(({registeredUsers})=>({registeredUsers}),{ addUser })(withRouter(RegistrationPage))
