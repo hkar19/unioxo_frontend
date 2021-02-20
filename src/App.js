@@ -9,6 +9,7 @@ import store from "./reduxStore";
 import ProfilePage from './routes/ProfilePage'
 
 import './App.css'
+import { useCookies } from 'react-cookie'
 
 const App = (props) => {
   return (
@@ -37,6 +38,8 @@ const App = (props) => {
 const AppWrapped = ()=>{
 
   const AppConnected = connect((states)=>({...states}))(App);
+  // useCookies
+  
 
   return (
     <Provider store={store}>
